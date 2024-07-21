@@ -95,29 +95,42 @@ return {
             desc = "Select TS workspace version",
           },
         },
-        stylelint_lsp = {
-          filetypes = { "css", "scss" },
-          root_dir = lspconfig.util.root_pattern("package.json", ".git"),
-          settings = {
-            stylelintplus = {
+      },
+
+      -- ESLint configuration
+      eslint = {
+        settings = {
+          linting = {
+            eslint = {
               autoFixOnSave = true,
-              autoFixOnFormat = true,
             },
           },
         },
+      },
 
-        -- Angular configuration
-        angularls = {
-          cmd = {
-            "ngserver",
-            "--stdio",
-            "--tsProbeLocations",
-            vim.fn.getcwd(),
-            "--ngProbeLocations",
-            vim.fn.getcwd(),
+      -- Stylelint configuration
+      stylelint_lsp = {
+        filetypes = { "css", "scss" },
+        root_dir = lspconfig.util.root_pattern("package.json", ".git"),
+        settings = {
+          stylelintplus = {
+            autoFixOnSave = true,
+            autoFixOnFormat = true,
           },
-          filetypes = { "typescript", "html", "typescriptreact", "typescript.tsx" },
         },
+      },
+
+      -- Angular configuration
+      angularls = {
+        cmd = {
+          "ngserver",
+          "--stdio",
+          "--tsProbeLocations",
+          vim.fn.getcwd(),
+          "--ngProbeLocations",
+          vim.fn.getcwd(),
+        },
+        filetypes = { "typescript", "html", "typescriptreact", "typescript.tsx" },
       },
     },
 
@@ -180,6 +193,12 @@ return {
         -- copy typescript settings to javascript
         opts.settings.javascript =
           vim.tbl_deep_extend("force", {}, opts.settings.typescript, opts.settings.javascript or {})
+      end,
+
+      eslint = function(_, opts)
+        opts.on_attach = function(client)
+          client.server_capabilities.document_formatting = true
+        end
       end,
 
       angularls = function(_, opts)
